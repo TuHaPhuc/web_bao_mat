@@ -1,0 +1,100 @@
+{% extends 'base_switchable.html' %}
+
+{% block title %}Đăng nhập - Hệ Thống Đăng Nhập{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+    <div class="card-header">
+        <h2>Đăng nhập</h2>
+        {% if not secure_mode %}
+        <div class="alert alert-warning mt-2">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Chế độ dễ bị tấn công:</strong> Trang này có lỗ hổng SQL Injection trong form đăng nhập.
+            <br>
+            <small>Thử đăng nhập với tên đăng nhập: <code>' OR '1'='1</code> và mật khẩu bất kỳ.</small>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="POST" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
+                <div class="invalid-feedback">Vui lòng nhập tên đăng nhập</div>
+                {% if secure_mode %}
+                <small class="text-success"><i class="fas fa-shield-alt"></i> Input được bảo vệ khỏi SQL Injection</small>
+                {% else %}
+                <small class="text-danger"><i class="fas fa-virus"></i> Input có thể bị tấn công SQL Injection</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="password-container">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                    <span class="toggle-password" data-target="password">Hiện</span>
+                </div>
+                <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+                    <label class="form-check-label" for="remember-me">Ghi nhớ đăng nhập</label>
+                </div>
+                <a href="{{ url_for('forgot_password') }}" class="forgot-password">Quên mật khẩu?</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </button>
+            
+            <div class="auth-footer">
+                <p>Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký ngay</a></p>
+            </div>
+        </form>
+    </div>
+    
+    {% if not secure_mode %}
+    <div class="card-footer">
+        <div class="sql-injection-examples">
+            <h5>Các ví dụ SQL Injection:</h5>
+            <ul>
+                <li><code class="clickable-injection" onclick="applyInjection(this.innerText)">' OR '1'='1</code> - Đăng nhập với tài khoản đầu tiên (thường là admin)</li>
+                <li><code class="clickable-injection" onclick="applyInjection(this.innerText)">' OR 1=1 --</code> - Đăng nhập bỏ qua mật khẩu</li>
+                <li><code class="clickable-injection" onclick="applyInjection(this.innerText)">admin' --</code> - Đăng nhập với tài khoản admin mà không cần mật khẩu</li>
+            </ul>
+        </div>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> <strong>Lưu ý:</strong> Các ví dụ SQL Injection chỉ hoạt động khi ứng dụng đang ở chế độ dễ bị tấn công.
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function applyInjection(text) {
+    document.getElementById('username').value = text;
+    document.getElementById('password').value = 'anything';
+}
+</script>
+
+<style>
+.clickable-injection {
+    background-color: #f8f9fa;
+    color: #dc3545;
+    padding: 2px 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.clickable-injection:hover {
+    background-color: #e9ecef;
+}
+
+.sql-injection-examples {
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}

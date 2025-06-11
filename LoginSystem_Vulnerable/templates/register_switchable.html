@@ -1,0 +1,205 @@
+{% extends 'base_switchable.html' %}
+
+{% block title %}Đăng ký - Hệ Thống Đăng Nhập{% endblock %}
+
+{% block content %}
+<div class="card auth-card">
+    <div class="card-header">
+        <h2>Đăng ký tài khoản</h2>
+        {% if secure_mode %}
+        <span class="security-mode secure">
+            <i class="fas fa-shield-alt"></i> Chế độ bảo mật
+        </span>
+        {% else %}
+        <span class="security-mode vulnerable">
+            <i class="fas fa-exclamation-triangle"></i> Chế độ dễ bị tấn công
+        </span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="POST" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
+                <div class="invalid-feedback">Vui lòng nhập tên đăng nhập</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Nhập địa chỉ email" required>
+                <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="password-container">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu (ít nhất 8 ký tự)" required>
+                    <span class="toggle-password" data-target="password">Hiện</span>
+                </div>
+                <div class="invalid-feedback">Mật khẩu phải có ít nhất 8 ký tự</div>
+                <div class="password-strength"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Xác nhận mật khẩu</label>
+                <div class="password-container">
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Nhập lại mật khẩu" required>
+                    <span class="toggle-password" data-target="confirm_password">Hiện</span>
+                </div>
+                <div class="invalid-feedback">Vui lòng xác nhận mật khẩu</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-user-plus"></i> Đăng ký
+            </button>
+            
+            <div class="auth-footer">
+                <p>Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+            </div>
+        </form>
+
+        {% if not secure_mode %}
+        <div class="alert alert-warning mt-4">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Lưu ý:</strong> Trong chế độ dễ bị tấn công, sau khi đăng ký thành công, bạn có thể dùng các kỹ thuật SQL Injection để lấy mật khẩu.
+        </div>
+        {% else %}
+        <div class="alert alert-success mt-4">
+            <i class="fas fa-shield-alt"></i> <strong>Thông tin bảo mật:</strong> Trong chế độ bảo mật, mật khẩu được mã hóa một chiều và bảo vệ bằng các biện pháp chống SQL Injection.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-header {
+        position: relative;
+    }
+    
+    .security-mode {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    
+    .security-mode.secure {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .security-mode.vulnerable {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .auth-card {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .password-container {
+        position: relative;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .auth-footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .password-strength {
+        height: 5px;
+        margin-top: 5px;
+        transition: all 0.3s;
+        border-radius: 3px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.textContent = 'Ẩn';
+                } else {
+                    passwordInput.type = 'password';
+                    this.textContent = 'Hiện';
+                }
+            });
+        });
+        
+        // Password strength indicator
+        const passwordInput = document.getElementById('password');
+        const strengthIndicator = document.querySelector('.password-strength');
+        
+        passwordInput.addEventListener('input', function() {
+            const strength = calculatePasswordStrength(this.value);
+            let color = '';
+            
+            if (strength === 0) {
+                color = '';
+            } else if (strength < 50) {
+                color = '#dc3545'; // weak
+            } else if (strength < 80) {
+                color = '#ffc107'; // medium
+            } else {
+                color = '#28a745'; // strong
+            }
+            
+            strengthIndicator.style.width = strength + '%';
+            strengthIndicator.style.backgroundColor = color;
+        });
+        
+        function calculatePasswordStrength(password) {
+            if (!password) return 0;
+            
+            let strength = 0;
+            
+            // Length
+            if (password.length >= 8) strength += 20;
+            if (password.length >= 12) strength += 10;
+            
+            // Complexity
+            if (/[a-z]/.test(password)) strength += 10;
+            if (/[A-Z]/.test(password)) strength += 15;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 15;
+            
+            // Variety
+            const variety = new Set(password.split('')).size;
+            strength += Math.min(15, variety * 2);
+            
+            return Math.min(100, strength);
+        }
+    });
+</script>
+{% endblock %}

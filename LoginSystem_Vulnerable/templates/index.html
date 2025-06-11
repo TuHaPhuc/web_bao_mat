@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang Chủ - Hệ Thống Đăng Nhập (VULNERABLE){% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header alert-danger">
+        <h2><i class="fas fa-exclamation-triangle"></i> Chào mừng đến với Hệ Thống Đăng Nhập Dễ Bị Tấn Công</h2>
+        <p class="text-danger">Đây là phiên bản cố tình tạo ra lỗ hổng SQL Injection - CHỈ DÙNG CHO MỤC ĐÍCH HỌC TẬP!</p>
+    </div>
+    <div class="card-body">
+        <div class="row">            <div class="col">
+                <h3>Hệ thống đăng nhập và đăng ký người dùng (có lỗ hổng bảo mật)</h3>
+                <p>
+                    Đây là một ứng dụng web được xây dựng với Python và Flask có chứa lỗ hổng SQL Injection.
+                    Hệ thống này được tạo ra chỉ cho mục đích giáo dục và nghiên cứu về bảo mật web.
+                </p>
+                
+                <div class="alert alert-warning">
+                    <h4><i class="fas fa-bug"></i> Lỗ hổng bảo mật có trong hệ thống này:</h4>
+                    <ul>
+                        <li><strong>SQL Injection trong form đăng nhập</strong> - Tham số username không được lọc</li>
+                        <li><strong>SQL Injection trong tìm kiếm người dùng</strong> - Xem trang quản lý người dùng</li>
+                    </ul>
+                    
+                    <h5>Ví dụ tấn công:</h5>
+                    <p>Đăng nhập với username: <code>' OR '1'='1</code> và mật khẩu bất kỳ</p>
+                </div>
+                
+                <h4>Tính năng chính:</h4>
+                <ul>
+                    <li>Đăng ký tài khoản người dùng</li>
+                    <li>Đăng nhập với lỗ hổng SQL Injection</li>
+                    <li>Quản lý thông tin tài khoản</li>
+                    <li>Trang quản lý người dùng với lỗ hổng SQL Injection trong tìm kiếm</li>
+                    <li>Thay đổi mật khẩu</li>
+                    <li>Phục hồi mật khẩu</li>
+                </ul>
+                
+                <div class="d-flex justify-content-between mt-3">
+                    {% if 'user_id' not in session %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Đi đến Bảng điều khiển
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3>Về ứng dụng này</h3>
+    </div>
+    <div class="card-body">
+        <p>
+            Ứng dụng này được xây dựng bằng các công nghệ hiện đại:
+        </p>
+        <ul>
+            <li><strong>Backend:</strong> Python với Flask framework</li>
+            <li><strong>Database:</strong> SQLite để lưu trữ dữ liệu người dùng</li>
+            <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript</li>
+            <li><strong>Bảo mật:</strong> Werkzeug security cho việc mã hóa mật khẩu</li>
+            <li><strong>Session Management:</strong> Flask Session cho quản lý phiên người dùng</li>
+        </ul>
+        
+        <p>
+            Đây là một ứng dụng mẫu để học tập về lỗ hổng SQL Injection và cách phòng chống.
+        </p>
+    </div>
+</div>
+
+<div class="card mt-3 bg-light">
+    <div class="card-header bg-info text-white">
+        <h3><i class="fas fa-shield-alt"></i> Giải thích về SQL Injection</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>SQL Injection là gì?</h4>
+                <p>
+                    SQL Injection là một kỹ thuật tấn công phổ biến nhằm chèn mã SQL độc hại vào các câu truy vấn 
+                    được thực hiện thông qua các form input của ứng dụng web. Khi thành công, kẻ tấn công có thể:
+                </p>
+                <ul>
+                    <li>Đọc dữ liệu nhạy cảm từ database</li>
+                    <li>Sửa đổi dữ liệu (thêm, sửa, xóa)</li>
+                    <li>Thực thi lệnh quản trị trên database</li>
+                    <li>Lấy thông tin về cấu trúc database</li>
+                    <li>Trong một số trường hợp, có thể thực thi lệnh hệ thống</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4>Cách phòng chống SQL Injection</h4>
+                <ol>
+                    <li>
+                        <strong>Sử dụng Prepared Statements (Parameterized Queries)</strong><br>
+                        <code>cursor.execute("SELECT * FROM users WHERE username = ?", (username,))</code>
+                    </li>
+                    <li>
+                        <strong>Sử dụng ORM (Object-Relational Mapping)</strong><br>
+                        <code>user = User.query.filter_by(username=username).first()</code>
+                    </li>
+                    <li>
+                        <strong>Lọc và xác thực dữ liệu người dùng</strong><br>
+                        Kiểm tra kiểu dữ liệu, độ dài, khuôn mẫu trước khi xử lý
+                    </li>
+                    <li>
+                        <strong>Cấp quyền tối thiểu cho tài khoản database</strong><br>
+                        Tài khoản database nên chỉ có quyền cần thiết để thực hiện chức năng của ứng dụng
+                    </li>
+                    <li>
+                        <strong>Xử lý lỗi an toàn</strong><br>
+                        Không hiển thị thông tin lỗi chi tiết cho người dùng
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

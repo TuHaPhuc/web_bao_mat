@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Hồ sơ - Hệ Thống Đăng Nhập{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Hồ sơ người dùng</h2>
+    </div>
+    <div class="card-body">
+        <div class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-info">
+                    <h3>{{ user.username }}</h3>
+                    <p class="text-muted">Thành viên từ: {{ user.created_at }}</p>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-group">
+                    <h4>Thông tin tài khoản</h4>
+                    <table class="info-table">
+                        <tr>
+                            <th><i class="fas fa-user"></i> Tên đăng nhập:</th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-envelope"></i> Email:</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-calendar-alt"></i> Ngày đăng ký:</th>
+                            <td>{{ user.created_at }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-clock"></i> Đăng nhập gần đây:</th>
+                            <td>{{ user.last_login or 'Chưa có' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <a href="{{ url_for('change_password') }}" class="btn btn-primary">
+                    <i class="fas fa-key"></i> Đổi mật khẩu
+                </a>
+                <!-- Có thể thêm các nút hành động khác cho phần mở rộng trong tương lai -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3>Cài đặt tài khoản</h3>
+    </div>
+    <div class="card-body">
+        <div class="settings-section">
+            <div class="settings-group">
+                <h4>Bảo mật</h4>
+                <p>Bạn nên thay đổi mật khẩu định kỳ để đảm bảo tính bảo mật cho tài khoản.</p>
+                <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-lock"></i> Đổi mật khẩu
+                </a>
+            </div>
+            
+            <div class="settings-group">
+                <h4>Bảo vệ tài khoản</h4>
+                <p>Luôn đảm bảo email của bạn là chính xác để có thể khôi phục tài khoản khi cần thiết.</p>
+                <!-- Phần này có thể mở rộng với các tính năng bảo vệ tài khoản khác trong tương lai -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

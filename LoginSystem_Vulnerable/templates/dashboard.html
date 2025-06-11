@@ -1,0 +1,84 @@
+<!-- filepath: c:\Users\Minh Phuc\Downloads\project-2025\Image-PDF-processing\PDF_OCR_Server_Vertex\LoginSystem\templates\dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Bảng điều khiển - Hệ Thống Đăng Nhập{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header dashboard-header">
+        <h2>Bảng điều khiển</h2>
+        <p>Chào mừng, <strong>{{ session.username }}</strong>!</p>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <div class="dashboard-stats">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Hồ sơ của bạn</h3>
+                            <p>Quản lý thông tin cá nhân</p>
+                            <a href="{{ url_for('profile') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-user"></i> Xem hồ sơ
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card info">
+                        <div class="stat-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Đổi mật khẩu</h3>
+                            <p>Cập nhật mật khẩu của bạn</p>
+                            <a href="{{ url_for('change_password') }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-lock"></i> Đổi mật khẩu
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Tài khoản</h3>
+                            <p>Thành viên từ: {{ user.created_at }}</p>
+                            <p>Đăng nhập cuối: {{ user.last_login or 'Chưa có' }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="activity-section mt-4">
+                    <h3><i class="fas fa-chart-line"></i> Hoạt động gần đây</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-primary">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>Đăng nhập</h4>
+                                <p>Bạn đã đăng nhập vào hệ thống</p>
+                                <span class="timeline-date">{{ user.last_login }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-success">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>Tạo tài khoản</h4>
+                                <p>Tài khoản của bạn được tạo</p>
+                                <span class="timeline-date">{{ user.created_at }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

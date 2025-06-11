@@ -1,0 +1,299 @@
+<!-- filepath: c:\Users\Minh Phuc\Downloads\project-2025\Image-PDF-processing\PDF_OCR_Server_Vertex\LoginSystem_Vulnerable\templates\admin_users.html -->
+{% extends 'base.html' %}
+
+{% block title %}Quản lý người dùng - Hệ Thống Đăng Nhập{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Quản lý người dùng</h2>
+        <p class="text-muted">Trang này chỉ dành cho quản trị viên</p>
+    </div>
+    <div class="card-body">
+        <div class="admin-search">
+            <form method="GET" action="{{ url_for('admin_users') }}" class="mb-3">
+                <div class="search-container">
+                    <input type="text" name="search" placeholder="Tìm kiếm theo tên hoặc email..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
+                <small class="text-danger">Chú ý: Input này dễ bị tấn công SQL Injection!</small>
+            </form>
+        </div>        {% if show_debug_info %}
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-bug"></i> SQL Injection Detected!</h4>
+            <p>{{ debug_info }}</p>
+            <pre class="sql-debug">{{ search }}</pre>
+        </div>
+        {% endif %}
+
+        {% if sql_structure %}
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="fas fa-database"></i> Database Structure Exposed!</h4>
+                <p>SQL Injection đã tiết lộ cấu trúc cơ sở dữ liệu</p>
+            </div>
+            <div class="card-body">
+                {% for table in sql_structure %}
+                <div class="sql-structure-item">
+                    <h5>Bảng: {{ table.table_name }}</h5>
+                    <pre class="sql-definition">{{ table.sql_def }}</pre>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}        {% if password_leak %}
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="fas fa-key"></i> Password Leak Detected!</h4>
+                <p>SQL Injection đã tiết lộ cả mật khẩu đã mã hóa và mật khẩu gốc</p>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <strong>Cảnh báo nghiêm trọng:</strong> Trong tình huống tấn công này, kẻ tấn công có thể đã sử dụng Rainbow tables, Brute force, hoặc Reverse engineering để giải mã mật khẩu từ chuỗi hash, hoặc lấy được mật khẩu từ nguồn bị lộ khác.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Mật khẩu gốc</th>
+                                <th>Mật khẩu đã mã hóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in password_leak %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td><code class="plaintext-password">{{ user.plain_password }}</code></td>
+                                <td><code class="password-hash">{{ user.password }}</code></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên đăng nhập</th>
+                        <th>Email</th>
+                        <th>Ngày đăng ký</th>
+                        <th>Đăng nhập gần đây</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.created_at }}</td>
+                        <td>{{ user.last_login or 'Chưa đăng nhập' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Không tìm thấy người dùng nào</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>    <div class="card-footer">
+        <div class="alert alert-warning">
+            <h4><i class="fas fa-exclamation-triangle"></i> Cảnh báo về SQL Injection</h4>
+            <p>Trang này cố tình tạo ra lỗ hổng SQL Injection để mục đích học tập. Nhấp vào ví dụ để thử:</p>
+        </div>
+        
+        <div class="sql-injection-test">
+            <h5>Các ví dụ SQL Injection để thử nghiệm:</h5>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning">Hiển thị tất cả người dùng</div>
+                        <div class="card-body">
+                            <code class="injection-sample" onclick="applySQLInjection(this.innerText)">' OR '1'='1</code>
+                            <p class="mt-2"><small>Kết quả: Hiển thị tất cả người dùng bất kể điều kiện tìm kiếm</small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning">Lộ cấu trúc cơ sở dữ liệu</div>
+                        <div class="card-body">
+                            <code class="injection-sample" onclick="applySQLInjection(this.innerText)">' UNION SELECT 1, name, sql, '4', '5' FROM sqlite_master WHERE type='table' --</code>
+                            <p class="mt-2"><small>Kết quả: Hiển thị thông tin về cấu trúc của tất cả các bảng</small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-warning">Lộ cấu trúc bảng users</div>
+                        <div class="card-body">
+                            <code class="injection-sample" onclick="applySQLInjection(this.innerText)">' UNION SELECT 1, name, sql, '4', '5' FROM sqlite_master WHERE type='table' AND name='users' --</code>
+                            <p class="mt-2"><small>Kết quả: Hiển thị cấu trúc chi tiết của bảng users</small></p>
+                        </div>
+                    </div>
+                </div>                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-danger">Lộ mật khẩu gốc và đã mã hóa</div>
+                        <div class="card-body">
+                            <code class="injection-sample" onclick="applySQLInjection(this.innerText)">' UNION SELECT 1, username, password FROM users --</code>
+                            <p class="mt-2"><small>Kết quả: Hiển thị username, mật khẩu gốc và mật khẩu đã mã hóa</small></p>
+                            <p class="text-danger"><small><strong>Nguy hiểm cao:</strong> Trong tình huống thực tế, một cuộc tấn công như vậy có thể dẫn đến việc chiếm quyền truy cập vào tất cả các tài khoản!</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-danger mt-3">
+                <strong>QUAN TRỌNG:</strong> Trong ứng dụng thực tế, luôn sử dụng tham số hóa truy vấn để tránh lỗi SQL Injection!
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    function applySQLInjection(injectionText) {
+        document.querySelector('input[name="search"]').value = injectionText;
+        document.querySelector('.admin-search form').submit();
+    }
+    </script>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-search {
+        margin-bottom: 2rem;
+    }
+    
+    .search-container {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-container input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table th, .table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .sql-debug {
+        background-color: #2d2d2d;
+        color: #e6db74;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .sql-structure-item {
+        margin-bottom: 20px;
+        border-left: 3px solid #dc3545;
+        padding-left: 15px;
+    }
+    
+    .sql-definition {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: 'Courier New', monospace;
+        white-space: pre-wrap;
+        color: #0066cc;
+        border: 1px solid #ddd;
+    }
+    
+    .sql-injection-test {
+        margin-top: 20px;
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 3px solid #ffc107;
+    }
+      .injection-sample {
+        font-family: 'Courier New', monospace;
+        background-color: #f1f1f1;
+        padding: 3px 6px;
+        border-radius: 3px;
+        color: #d63031;
+        cursor: pointer;
+    }
+      .password-hash {
+        color: #ffc107;
+        background-color: #343a40;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        max-width: 300px;
+        overflow-x: auto;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    
+    .plaintext-password {
+        color: #ffffff;
+        background-color: #e74c3c;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        font-weight: bold;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+        text-shadow: 0px 0px 5px rgba(255,255,255,0.5);
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+        }
+    }
+    
+    .table-dark {
+        background-color: #2d3436;
+        color: #dfe6e9;
+    }
+    
+    .table-dark th {
+        background-color: #2d3436;
+        color: #74b9ff;
+    }
+    
+    code {
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: monospace;
+    }
+</style>
+{% endblock %}

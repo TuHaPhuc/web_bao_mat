@@ -1,0 +1,97 @@
+<!-- filepath: c:\Users\Minh Phuc\Downloads\project-2025\Image-PDF-processing\PDF_OCR_Server_Vertex\LoginSystem\templates\404.html -->
+{% extends 'base.html' %}
+
+{% block title %}404 - Trang không tìm thấy{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">404</div>
+        <h2 class="error-title">Không tìm thấy trang</h2>
+        <p class="error-message">
+            Rất tiếc, trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.
+        </p>
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Quay về trang chủ
+            </a>
+            <button onclick="window.history.back()" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Quay lại trang trước
+            </button>
+        </div>
+    </div>
+    <div class="error-image">
+        <i class="fas fa-search"></i>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3>Bạn có thể thử:</h3>
+    </div>
+    <div class="card-body">
+        <ul class="help-list">
+            <li>Kiểm tra lại URL bạn đã nhập</li>
+            <li>Quay về <a href="{{ url_for('index') }}">trang chủ</a></li>
+            <li>Nếu bạn tin rằng đây là lỗi, vui lòng báo cáo cho chúng tôi</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .error-content {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .error-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8rem;
+        color: var(--secondary-color);
+        opacity: 0.6;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .error-code {
+        font-size: 5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .error-title {
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+    }
+    
+    .error-message {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        color: var(--secondary-color);
+    }
+    
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .help-list {
+        padding-left: 1.5rem;
+        line-height: 2;
+    }
+</style>
+{% endblock %}
