@@ -1,6 +1,6 @@
 # LoginSystem Vulnerable
 
-# Link demo: phucdemo.hmp.it.com
+# Link demo: https://phucdemo.hmp.it.com/
 
 ## 🚨 Chỉ Dành Cho Mục Đích Học Tập | Educational Purpose Only
 Đây là một phiên bản cố tình dễ bị tấn công của hệ thống đăng nhập thông thường. Dự án này được tạo ra **CHỈ** cho mục đích học tập và nghiên cứu về bảo mật web, cụ thể là lỗ hổng SQL Injection.
